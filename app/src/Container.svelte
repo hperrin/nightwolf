@@ -1,9 +1,5 @@
 {#if $user === false}
-  <div class="loading-container">
-    <div>
-      <LinearProgress indeterminate />
-    </div>
-  </div>
+  <LoadingIndicator />
 {:else}
   <div class="app-frame">
     <TopAppBar variant="static" color="primary">
@@ -105,9 +101,7 @@
         </div>
       {/if}
       {#if $user}
-        <div class="container mt-3">
-          <App />
-        </div>
+        <App />
       {/if}
     </div>
   </div>
@@ -118,7 +112,6 @@
   import { User } from 'tilmeld-client';
   import Login from 'tilmeld-components/src/Login';
   import ChangePassword from 'tilmeld-components/src/ChangePassword';
-  import LinearProgress from '@smui/linear-progress';
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import IconButton from '@smui/icon-button';
   import { mdiAccount } from '@mdi/js';
@@ -129,10 +122,10 @@
   import Dialog, {Title as DialogTitle, Content, Actions, InitialFocus} from '@smui/dialog';
   import Textfield from '@smui/textfield';
   import Select, {Option} from '@smui/select';
-  import A from '@smui/common/A';
 
   import App from './App/App';
   import FrontPage from './App/FrontPage';
+  import LoadingIndicator from './App/LoadingIndicator';
 
   import MdiIcon from './MdiIcon';
   import ErrHandler from './ErrHandler';
@@ -159,16 +152,6 @@
 </script>
 
 <style>
-  .loading-container {
-    display: flex;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-  }
-  .loading-container > * {
-    width: 60%;
-  }
-
   .app-frame {
     display: flex;
     flex-direction: column;
