@@ -4,7 +4,11 @@ export class Game extends Entity {
   constructor(id) {
     super(id);
     this.code = null;
-    this.finished = false;
+    this.state = Game.PENDING;
+  }
+
+  $start(...args) {
+    return this.$serverCall('start', args);
   }
 
   $share(...args) {
@@ -18,6 +22,10 @@ export class Game extends Entity {
 
 // The name of the server class
 Game.class = 'NightWolf\\Game';
+
+Game.PENDING = 0;
+Game.IN_PROGRESS = 1;
+Game.FINISHED = 2;
 
 Nymph.setEntityClass(Game.class, Game);
 

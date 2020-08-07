@@ -9,14 +9,18 @@ use Respect\Validation\Exceptions\NestedValidationException;
  */
 class Game extends \Nymph\Entity {
   const ETYPE = 'game';
-  protected $clientEnabledMethods = ['share', 'unshare'];
-  protected $whitelistData = ['finished'];
+  protected $clientEnabledMethods = ['start', 'share', 'unshare'];
+  protected $whitelistData = [];
   protected $searchRestrictedData = ['code'];
   protected $protectedTags = [];
   protected $whitelistTags = [];
 
+  const PENDING = 0;
+  const IN_PROGRESS = 1;
+  const FINISHED = 2;
+
   public function __construct($id = 0) {
-    $this->finished = false;
+    $this->state = self::PENDING;
     $this->acOther = \Tilmeld\Tilmeld::NO_ACCESS;
     parent::__construct($id);
   }
@@ -32,11 +36,27 @@ class Game extends \Nymph\Entity {
 
       $existingGame = \Nymph\Nymph::getEntity(
         ['class' => 'NightWolf\\Game', 'skip_ac' => true],
-        ['strict' => ['code', $code]]
+        ['strict' =>
+          [
+            ['code', $code],
+            ['started', false],
+            ['finished', false]
+          ]
+        ]
       );
     } while ($existingGame->guid);
 
     return $code;
+  }
+
+  public function start() {
+    if (!$this->guid || !$this->user->is(\Tilmeld\Tilmeld::$currentUser)) {
+      return false;
+    }
+
+    $this->state = self::IN_PROGRESS;
+
+    return $this->save();
   }
 
   public function share($username) {
@@ -77,7 +97,11 @@ class Game extends \Nymph\Entity {
         //   'name',
         //   v::stringType()->notEmpty()->prnt()->length(1, 2048)
         // )
-        ->attribute('finished', v::boolType())
+        // ->attribute('started', v::boolType())
+        ->attribute(
+          'state',
+          v::in([self::PENDING, self::IN_PROGRESS, self::FINISHED], true)
+        )
         ->setName('game')
         ->assert($this->getValidatable());
     } catch (NestedValidationException $exception) {
