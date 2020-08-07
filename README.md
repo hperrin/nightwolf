@@ -1,6 +1,6 @@
 # Night Wolf
 
-A werewolf/mafia game client/server. Play over VC.
+A free and open source web based Werewolf/Mafia game. Play in the same room on your phones or play in a video call together! The server acts as the narrator, so everyone can play!
 
 <big>This is currently in development! It doesn't work yet!</big>
 
