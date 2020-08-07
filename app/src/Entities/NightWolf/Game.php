@@ -5,27 +5,38 @@ use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException;
 
 /**
- * @property string $name The todo's text.
- * @property bool $done Whether it's done.
+ * @property string $code The game's access code.
  */
 class Game extends \Nymph\Entity {
   const ETYPE = 'game';
-  protected $clientEnabledMethods = ['archive', 'share', 'unshare'];
-  protected $whitelistData = ['name', 'done'];
-  protected $protectedTags = ['archived'];
+  protected $clientEnabledMethods = ['share', 'unshare'];
+  protected $whitelistData = ['finished'];
+  protected $searchRestrictedData = ['code'];
+  protected $protectedTags = [];
   protected $whitelistTags = [];
 
   public function __construct($id = 0) {
-    $this->done = false;
+    $this->finished = false;
+    $this->acOther = \Tilmeld\Tilmeld::NO_ACCESS;
     parent::__construct($id);
   }
 
-  public function archive() {
-    if ($this->hasTag('archived')) {
-      return true;
-    }
-    $this->addTag('archived');
-    return $this->save();
+  public static function generateCode() {
+    $chars = explode('', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789');
+
+    do {
+      $code = '';
+      for ($i = 0; $i < 5; $i++) {
+        $code .= $chars[rand(0, count($chars) - 1)];
+      }
+
+      $existingGame = \Nymph\Nymph::getEntity(
+        ['class' => 'NightWolf\\Game', 'skip_ac' => true],
+        ['strict' => ['code', $code]]
+      );
+    } while ($existingGame->guid);
+
+    return $code;
   }
 
   public function share($username) {
@@ -55,14 +66,19 @@ class Game extends \Nymph\Entity {
       // Only allow logged in users to save.
       return false;
     }
+
+    if (empty($this->code)) {
+      $this->code = self::generateCode();
+    }
+
     try {
       v::notEmpty()
-        ->attribute(
-          'name',
-          v::stringType()->notEmpty()->prnt()->length(1, 2048)
-        )
-        ->attribute('done', v::boolType())
-        ->setName('todo')
+        // ->attribute(
+        //   'name',
+        //   v::stringType()->notEmpty()->prnt()->length(1, 2048)
+        // )
+        ->attribute('finished', v::boolType())
+        ->setName('game')
         ->assert($this->getValidatable());
     } catch (NestedValidationException $exception) {
       throw new \Exception($exception->getFullMessage());

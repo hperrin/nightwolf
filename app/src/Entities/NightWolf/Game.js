@@ -3,11 +3,8 @@ import { Nymph, Entity } from 'nymph-client';
 export class Game extends Entity {
   constructor(id) {
     super(id);
-    this.done = false;
-  }
-
-  $archive(...args) {
-    return this.$serverCall('archive', args);
+    this.code = null;
+    this.finished = false;
   }
 
   $share(...args) {

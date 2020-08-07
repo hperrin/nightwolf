@@ -1,12 +1,7 @@
 <div>
   {#if loading}
-    <div
-      class="row align-items-center justify-content-center"
-      style="height: 200px;"
-    >
-      <div class="col-auto">
-        <LoadingIndicator width="50px" height="50px" />
-      </div>
+    <div style="height: 200px;">
+      <LoadingIndicator />
     </div>
   {:else}
     <div class="row">
