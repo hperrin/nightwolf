@@ -2,7 +2,7 @@
   <h1>{brand}!</h1>
   <p>
     A free and open source web based Werewolf/Mafia game. Play in the same room on your phones
-    or play in a video call together!
+    or play in a video call together! The server acts as the narrator, so everyone can play!
   </p>
   <p>
     <Button href="https://github.com/hperrin/nightwolf" target="_blank">
