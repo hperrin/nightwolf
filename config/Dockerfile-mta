@@ -1,0 +1,6 @@
+FROM tozd/postfix:alpine-38
+
+RUN echo "root:nymph_template_password" | chpasswd
+
+COPY postfix-main.cf /etc/postfix/main.cf
+COPY mailname /etc/mailname
