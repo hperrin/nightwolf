@@ -11,7 +11,7 @@ class Game extends \Nymph\Entity {
   const ETYPE = 'game';
   protected $clientEnabledMethods = ['start', 'share', 'unshare'];
   protected $whitelistData = [];
-  protected $searchRestrictedData = ['code'];
+  public static $searchRestrictedData = ['code'];
   protected $protectedTags = [];
   protected $whitelistTags = [];
 
