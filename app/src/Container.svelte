@@ -1,16 +1,30 @@
 {#if $user === false}
-  <div class="container" style="height: 100vh;">
-    <div
-      class="row align-items-center justify-content-center"
-      style="height: 100vh;"
-    >
-      <div class="col-auto">
-        <LoadingIndicator width="200px" height="200px" />
-      </div>
+  <div class="loading-container">
+    <div>
+      <LinearProgress indeterminate />
     </div>
   </div>
 {/if}
 {#if $user !== false}
+  <div class="flexor">
+    <TopAppBar variant="static" color="primary">
+      <Row>
+        <Section>
+          <Title>{brand}</Title>
+        </Section>
+        <Section align="end" toolbar>
+          <IconButton aria-label="Account">
+            <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+              <path fill="currentColor" d="{mdiAccount}" />
+            </svg>
+          </IconButton>
+        </Section>
+      </Row>
+    </TopAppBar>
+    <div class="flexor-content">
+      test
+    </div>
+  </div>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <span class="navbar-brand mb-0 h1">{brand}</span>
@@ -220,6 +234,10 @@
   import { User } from 'tilmeld-client';
   import Login from 'tilmeld-components/src/Login';
   import ChangePassword from 'tilmeld-components/src/ChangePassword';
+  import LinearProgress from '@smui/linear-progress';
+  import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
+  import IconButton from '@smui/icon-button';
+  import { mdiAccount } from '@mdi/js';
   import App from './App/App';
   import LoadingIndicator from './App/LoadingIndicator';
   import NavBar from './App/NavBar';
@@ -243,3 +261,26 @@
     }, ErrHandler);
   }
 </script>
+
+<style>
+  .loading-container {
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+  }
+  .loading-container > * {
+    width: 60%;
+  }
+
+  .flexor {
+    display: flex;
+    flex-direction: column;
+  }
+  .flexor-content {
+    flex-basis: 0;
+    height: 0;
+    flex-grow: 1;
+    overflow: auto;
+  }
+</style>

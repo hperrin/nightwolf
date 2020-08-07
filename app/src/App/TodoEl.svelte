@@ -110,11 +110,11 @@
 </div>
 
 <script>
-  import Todo from '../Entities/MyApp/Todo';
+  import Game from '../Entities/NightWolf/Game';
   import ErrHandler from '../ErrHandler';
   import { user, archived } from '../stores';
 
-  export let todo = new Todo();
+  export let todo = new Game();
   let shareUsername = '';
   let expanded = false;
 

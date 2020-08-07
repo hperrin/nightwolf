@@ -4,8 +4,8 @@ import { Nymph } from 'nymph-client';
 import { User, Group } from 'tilmeld-client';
 import { SleepyCacheService } from './Services/SleepyCacheService';
 
+import './main.css';
 import 'pform/css/pform.css';
-import 'pform/css/pform-bootstrap.css';
 
 const sleepyUserCacheService = new SleepyCacheService(User);
 const sleepyGroupCacheService = new SleepyCacheService(Group);
@@ -18,7 +18,7 @@ export function refreshAll() {
 const app = new Container({
   target: document.querySelector('main'),
   props: {
-    brand: 'App Template',
+    brand: 'Night Wolf',
   },
 });
 

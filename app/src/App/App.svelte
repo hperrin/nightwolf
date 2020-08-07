@@ -116,7 +116,7 @@
 <script>
   import { onDestroy } from 'svelte';
   import { Nymph, PubSub } from 'nymph-client';
-  import Todo from '../Entities/MyApp/Todo';
+  import Game from '../Entities/NightWolf/Game';
   import LoadingIndicator from './LoadingIndicator';
   import TodoEl from './TodoEl';
   import ErrHandler from '../ErrHandler';
@@ -154,7 +154,7 @@
 
     subscription = Nymph.getEntities(
       {
-        class: Todo.class,
+        class: Game.class,
       },
       {
         type: $archived ? '&' : '!&',
@@ -187,7 +187,7 @@
     if (todoText === undefined || todoText === '') {
       return;
     }
-    const todo = new Todo();
+    const todo = new Game();
     todo.name = todoText;
     todo.$save().then(() => {
       todoText = '';

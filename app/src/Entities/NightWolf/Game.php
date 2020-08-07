@@ -1,5 +1,5 @@
 <?php
-namespace MyApp;
+namespace NightWolf;
 
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException;
@@ -8,8 +8,8 @@ use Respect\Validation\Exceptions\NestedValidationException;
  * @property string $name The todo's text.
  * @property bool $done Whether it's done.
  */
-class Todo extends \Nymph\Entity {
-  const ETYPE = 'todo';
+class Game extends \Nymph\Entity {
+  const ETYPE = 'game';
   protected $clientEnabledMethods = ['archive', 'share', 'unshare'];
   protected $whitelistData = ['name', 'done'];
   protected $protectedTags = ['archived'];

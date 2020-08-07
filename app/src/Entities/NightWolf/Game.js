@@ -1,6 +1,6 @@
 import { Nymph, Entity } from 'nymph-client';
 
-export class Todo extends Entity {
+export class Game extends Entity {
   constructor(id) {
     super(id);
     this.done = false;
@@ -20,8 +20,8 @@ export class Todo extends Entity {
 }
 
 // The name of the server class
-Todo.class = 'MyApp\\Todo';
+Game.class = 'NightWolf\\Game';
 
-Nymph.setEntityClass(Todo.class, Todo);
+Nymph.setEntityClass(Game.class, Game);
 
-export default Todo;
+export default Game;

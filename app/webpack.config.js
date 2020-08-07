@@ -2,6 +2,7 @@ const path = require('path');
 const { HotModuleReplacementPlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const analyze = process.env.WEBPACK_ANALYZE === 'true';
 const devMode = process.env.NODE_ENV !== 'production';
@@ -48,6 +49,14 @@ module.exports = {
             chunkFilename: '[name].css',
           }),
         ]),
+    new OptimizeCssAssetsPlugin({
+      assetNameRegExp: /\.css$/g,
+      cssProcessor: require('cssnano'),
+      cssProcessorPluginOptions: {
+        preset: ['default', { discardComments: { removeAll: true } }]
+      },
+      canPrint: true
+    }),
     ...(analyze ? [new BundleAnalyzerPlugin()] : []),
     ...(hotMode ? [new HotModuleReplacementPlugin()] : []),
   ],
@@ -93,7 +102,17 @@ module.exports = {
         use: [
           devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
           'css-loader',
-          'sass-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                includePaths: [
+                  './theme',
+                  './node_modules'
+                ]
+              }
+            }
+          },
         ],
       },
       {
