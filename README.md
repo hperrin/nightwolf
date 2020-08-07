@@ -2,7 +2,7 @@
 
 A werewolf/mafia game client/server. Play over VC.
 
-Check out nightwolfgame.com for a running version, or start your own server.
+Check out https://nightwolfgame.com for a running version, or start your own server.
 
 # Running Dev Environment
 
