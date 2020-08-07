@@ -1,26 +1,21 @@
-<div class="jumbotron">
-  <h1 class="display-4">{brand}!</h1>
-  <p class="lead">
-    This is a template for you to use to build an app with Nymph and Tilmeld.
-  </p>
-  <hr class="my-4" />
+<div>
+  <h1>{brand}!</h1>
   <p>
-    It provides a Docker setup that runs MySQL, Nymph, Tilmeld, Postfix to send
-    emails, and a server for your static content.
+    A free and open source web based Werewolf/Mafia game. Play in the same room on your phones
+    or play in a video call together!
   </p>
-  <p>Create a new account with the form on this page.</p>
-  <p>When you're ready to start developing, check out the API docs.</p>
-  <p class="lead">
-    <a
-      class="btn btn-primary btn-lg"
-      href="https://github.com/sciactive/nymph/wiki/API-Docs"
-      role="button"
-    >
-      API docs
-    </a>
+  <p>
+    <Button href="https://github.com/hperrin/nightwolf" target="_blank">
+      <Label>Fork Me on GitHub</Label><Icon><MdiIcon size={18} path={mdiGithub} /></Icon>
+    </Button>
   </p>
 </div>
 
 <script>
+  import Button, {Label, Icon} from '@smui/button';
+  import {mdiGithub} from '@mdi/js';
+
+  import MdiIcon from '../MdiIcon';
+
   export let brand;
 </script>

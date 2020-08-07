@@ -4,7 +4,7 @@ import { Nymph } from 'nymph-client';
 import { User, Group } from 'tilmeld-client';
 import { SleepyCacheService } from './Services/SleepyCacheService';
 
-import './main.css';
+import './main.scss';
 import 'pform/css/pform.css';
 
 const sleepyUserCacheService = new SleepyCacheService(User);

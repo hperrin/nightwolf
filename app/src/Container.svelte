@@ -4,227 +4,111 @@
       <LinearProgress indeterminate />
     </div>
   </div>
-{/if}
-{#if $user !== false}
-  <div class="flexor">
+{:else}
+  <div class="app-frame">
     <TopAppBar variant="static" color="primary">
       <Row>
         <Section>
           <Title>{brand}</Title>
         </Section>
-        <Section align="end" toolbar>
-          <IconButton aria-label="Account">
-            <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
-              <path fill="currentColor" d="{mdiAccount}" />
-            </svg>
-          </IconButton>
-        </Section>
-      </Row>
-    </TopAppBar>
-    <div class="flexor-content">
-      test
-    </div>
-  </div>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <span class="navbar-brand mb-0 h1">{brand}</span>
-      {#if $user}
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon" />
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav mr-auto">
-            <NavBar />
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle p-0"
-                href="javascript:void(0)"
-                id="userDropdown"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
+        {#if $user}
+          <Section align="end" toolbar>
+            <IconButton aria-label="Account" on:click={() => accountMenu.setOpen(true)}>
+              {#if $userAvatar}
                 <img
-                  class="rounded-circle"
-                  src={$userAvatar ? $userAvatar : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoAgMAAADxkFD+AAAACVBMVEXMzMyWlpa3t7fI5tFIAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAF0lEQVQYlWNgGOagiQPOdGQZQHdQGQAArI4A0FwgBeUAAAAASUVORK5CYII='}
+                  style="border-radius: 50%; height: 24px; width: 24px;"
+                  src={$userAvatar}
                   alt={$user.nameFirst}
                 />
-              </a>
-              <div
-                class="dropdown-menu dropdown-menu-right"
-                aria-labelledby="userDropdown"
-              >
-                <h6 class="dropdown-header">{$user.name}</h6>
-                <a
-                  class="dropdown-item"
-                  href="javascript:void(0)"
-                  data-toggle="modal"
-                  data-target="#accountInfoModal"
-                >
-                  Account Info
-                </a>
-                <div class="dropdown-divider" />
-                <a
-                  class="dropdown-item"
-                  href="javascript:void(0)"
-                  on:click={logout}
-                >
-                  Log Out
-                </a>
-                {#if $userIsTilmeldAdmin}
-                  <div class="dropdown-divider" />
-                  <h6 class="dropdown-header">Admin</h6>
-                  <a class="dropdown-item" href="/user/" target="_blank">
-                    User Admin App
-                  </a>
+              {:else}
+                <MdiIcon path={mdiAccount} />
+              {/if}
+              <Menu bind:this={accountMenu}>
+                <List>
+                  <Item on:SMUI:action={() => accountDialog.open()}><Text>Account Info</Text></Item>
+                  <Item on:SMUI:action={logout}><Text>Log Out</Text></Item>
+                  {#if $userIsTilmeldAdmin}
+                    <Separator />
+                    <Item on:SMUI:action={() => window.open('/user/')}><Text>User Admin App</Text></Item>
+                  {/if}
+                </List>
+              </Menu>
+            </IconButton>
+            <Dialog bind:this={accountDialog} aria-labelledby="account-title" aria-describedby="account-content">
+              <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+              <DialogTitle id="account-title">Account Info</DialogTitle>
+              <Content id="account-content">
+                <div>
+                  <Textfield bind:value={$user.username} label="Email" type="email" />
+                </div>
+                <div>
+                  <Textfield bind:value={$user.nameFirst} label="First Name" />
+                </div>
+                <div>
+                  <Textfield bind:value={$user.nameLast} label="Last Name" />
+                </div>
+                <!-- <div><Textfield bind:value={$user.phone} label="Phone" type="tel" /></div> -->
+                {#if clientConfig.timezones}
+                  <div>
+                    <Select bind:value={$user.timezone} label="Timezone">
+                      <Option value=""></Option>
+                      {#each clientConfig.timezones as tz}
+                        <Option value={tz} selected={$user.timezone === tz}>{tz}</Option>
+                      {/each}
+                    </Select>
+                  </div>
                 {/if}
-              </div>
-            </li>
-          </ul>
+                <div style="margin-top: 1em;">
+                  <ChangePassword
+                    layout="compact"
+                    classInput="form-control"
+                    classSubmit="btn btn-primary"
+                    classButton="btn btn-secondary"
+                  />
+                </div>
+              </Content>
+              <Actions>
+                <Button>
+                  <Label>Close</Label>
+                </Button>
+                <Button on:click={saveUser}>
+                  <Label>Save</Label>
+                </Button>
+              </Actions>
+            </Dialog>
+          </Section>
+        {/if}
+      </Row>
+    </TopAppBar>
+    <div class="app-content">
+      {#if $user === null}
+        <div class="frontpage-container">
+          <div class="login">
+            <Paper class="login-paper">
+              <Login
+                layout="small"
+                classInput="form-control"
+                classSelect="form-control"
+                classTextarea="form-control"
+                classSubmit="btn btn-primary"
+                classButtonGroup="btn-group d-flex"
+                classButton="btn btn-secondary"
+                classButtonToggle="flex-grow-1"
+                classButtonActive="active"
+                disableActiveButton={false}
+              />
+            </Paper>
+          </div>
+          <div class="frontpage">
+            <FrontPage {brand} />
+          </div>
         </div>
       {/if}
-    </div>
-  </nav>
-{/if}
-{#if $user === null}
-  <div class="container mt-3">
-    <div class="row">
-      <div class="col-sm-4 order-sm-2">
-        <Login
-          layout="small"
-          classInput="form-control"
-          classSelect="form-control"
-          classTextarea="form-control"
-          classSubmit="btn btn-primary"
-          classButtonGroup="btn-group d-flex"
-          classButton="btn btn-secondary"
-          classButtonToggle="flex-grow-1"
-          classButtonActive="active"
-          disableActiveButton={false}
-        />
-      </div>
-      <div class="col-sm-8 order-sm-1">
-        <FrontPage {brand} />
-      </div>
-    </div>
-  </div>
-{/if}
-{#if $user}
-  <div class="container mt-3">
-    <App />
-  </div>
-  <div
-    class="modal fade"
-    id="accountInfoModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="accountInfoModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="accountInfoModalLabel">Account info</h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
+      {#if $user}
+        <div class="container mt-3">
+          <App />
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="accountDetailsEmail">Email address</label>
-            <input
-              type="email"
-              class="form-control"
-              id="accountDetailsEmail"
-              bind:value={$user.username}
-              placeholder="Enter email"
-            />
-          </div>
-          <div class="form-group">
-            <label for="accountDetailsFirstName">First name</label>
-            <input
-              type="text"
-              class="form-control"
-              id="accountDetailsFirstName"
-              bind:value={$user.nameFirst}
-              placeholder="Enter name"
-            />
-          </div>
-          <div class="form-group">
-            <label for="accountDetailsLastName">Last name</label>
-            <input
-              type="text"
-              class="form-control"
-              id="accountDetailsLastName"
-              bind:value={$user.nameLast}
-              placeholder="Enter name"
-            />
-          </div>
-          <div class="form-group">
-            <label for="accountDetailsPhone">Phone</label>
-            <input
-              type="tel"
-              class="form-control"
-              id="accountDetailsPhone"
-              bind:value={$user.phone}
-              placeholder="Enter phone number"
-            />
-          </div>
-          {#if clientConfig.timezones}
-            <div class="form-group">
-              <label for="accountDetailsTimezone">Timezone</label>
-              <select
-                class="form-control"
-                id="accountDetailsTimezone"
-                bind:value={$user.timezone}
-              >
-                <option value="">--Default--</option>
-                {#each clientConfig.timezones as tz}
-                  <option value={tz}>{tz}</option>
-                {/each}
-              </select>
-            </div>
-          {/if}
-          <div class="form-group">
-            <span>Password</span>
-            <ChangePassword
-              layout="compact"
-              classInput="form-control"
-              classSubmit="btn btn-primary"
-              classButton="btn btn-secondary"
-            />
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-dismiss="modal"
-            on:click={saveUser}
-          >
-            Save changes
-          </button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Close
-          </button>
-        </div>
-      </div>
+      {/if}
     </div>
   </div>
 {/if}
@@ -238,15 +122,27 @@
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import IconButton from '@smui/icon-button';
   import { mdiAccount } from '@mdi/js';
+  import Menu from '@smui/menu';
+  import List, {Item, Separator, Text, PrimaryText, SecondaryText, Graphic} from '@smui/list';
+  import Button, {Label} from '@smui/button';
+  import Paper from '@smui/paper';
+  import Dialog, {Title as DialogTitle, Content, Actions, InitialFocus} from '@smui/dialog';
+  import Textfield from '@smui/textfield';
+  import Select, {Option} from '@smui/select';
+  import A from '@smui/common/A';
+
   import App from './App/App';
-  import LoadingIndicator from './App/LoadingIndicator';
-  import NavBar from './App/NavBar';
   import FrontPage from './App/FrontPage';
+
+  import MdiIcon from './MdiIcon';
   import ErrHandler from './ErrHandler';
   import { user, userAvatar, userIsTilmeldAdmin, logout } from './stores';
 
   export let brand;
   let clientConfig = {};
+
+  let accountMenu;
+  let accountDialog;
 
   onMount(() => {
     // Get the client config (for timezones).
@@ -265,7 +161,7 @@
 <style>
   .loading-container {
     display: flex;
-    height: 100vh;
+    height: 100%;
     align-items: center;
     justify-content: center;
   }
@@ -273,14 +169,51 @@
     width: 60%;
   }
 
-  .flexor {
+  .app-frame {
     display: flex;
     flex-direction: column;
+    height: 100%;
   }
-  .flexor-content {
+  .app-content {
     flex-basis: 0;
     height: 0;
     flex-grow: 1;
     overflow: auto;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .frontpage-container {
+    display: flex;
+  }
+  .login {
+    order: 2;
+    width: 30%;
+    margin-left: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .login > :global(.login-paper) {
+    width: max-content;
+    height: max-content;
+  }
+  .frontpage {
+    order: 1;
+    flex-grow: 1;
+  }
+
+  @media (max-width: 600px) {
+    .frontpage-container {
+      flex-direction: column;
+    }
+    .login {
+      order: 1;
+      width: 100%;
+      margin-left: 0;
+    }
+    .frontpage {
+      order: 2;
+    }
   }
 </style>
