@@ -18,6 +18,10 @@ export class Game extends Entity {
   $unshare(...args) {
     return this.$serverCall('unshare', args);
   }
+
+  static join(code, ...args) {
+    return Game.serverCallStatic('join', [code, ...args]);
+  }
 }
 
 // The name of the server class

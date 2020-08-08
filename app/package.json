@@ -30,6 +30,7 @@
     "@material/typography": "^3.1.0",
     "@mdi/js": "^5.4.55",
     "@smui/button": "^1.0.0",
+    "@smui/card": "^1.0.0",
     "@smui/dialog": "^1.0.0",
     "@smui/icon-button": "^1.0.0",
     "@smui/linear-progress": "^1.0.0",

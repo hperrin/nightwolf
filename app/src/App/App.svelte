@@ -3,110 +3,88 @@
     <div style="height: 200px;">
       <LoadingIndicator />
     </div>
+  {:else if $game}
+    <GamePlay />
   {:else}
-    <div class="row">
-      <div class="col-sm-8 mb-3">
-        <div class="list-group">
-          {#if $games.length}
-            {#each $games as todo (todo.guid)}
-              <TodoEl bind:todo />
-            {/each}
-          {:else}
-            <div class="alert alert-secondary">You have no games in progress.</div>
-          {/if}
+    <div class="lobby">
+      <div class="lobby-section">
+        <div>
+          <Textfield variant="outlined" label="Game Code" bind:value={joinCode} input$maxlength="5" />
+        </div>
+        <div style="margin-left: 20px;">
+          <Button on:click={join} disabled={joinCode.length != 5 || joinCode.match(/[^A-Z1-9]/)}>
+            <Label>Join Game</Label>
+          </Button>
+        </div>
+        <div style="margin-left: 20px;">
+          <Button on:click={create}><Label>New Game</Label></Button>
         </div>
       </div>
+      <div class="lobby-section">
+        <GamesList />
+      </div>
     </div>
-    <form class="d-flex my-3" on:submit|preventDefault={addTodo}>
-      <input
-        class="form-control mr-2"
-        style="flex-grow: 1;"
-        type="text"
-        bind:value={todoText}
-        placeholder="add new todo here"
-      />
-      <input
-        class="btn btn-primary"
-        type="submit"
-        value="add #{$games.length + 1}"
-      />
-    </form>
   {/if}
 </div>
 
 <script>
-  import { onDestroy } from 'svelte';
-  import { Nymph, PubSub } from 'nymph-client';
-  import Game from '../Entities/NightWolf/Game';
-  import LoadingIndicator from './LoadingIndicator';
-  import TodoEl from './TodoEl';
-  import ErrHandler from '../ErrHandler';
-  import { games, game, user } from '../stores';
+  import Textfield from '@smui/textfield';
+  import Button, {Label} from '@smui/button';
+  import Paper from '@smui/paper';
 
-  let todoText = '';
-  let subscription;
+  import Game from '../Entities/NightWolf/Game';
+  import ErrHandler from '../ErrHandler';
+  import { game } from '../stores';
+
+  import LoadingIndicator from './LoadingIndicator';
+  import GamesList from './GamesList';
+  import GamePlay from './Game/GamePlay';
+
+  let joinCode = '';
   let loading = false;
 
-  $: remaining = $games.filter((todo) => !todo.done).length;
-
-  let previousUser;
-  $: {
-    if ($user && !$user.$is(previousUser)) {
-      subscribe();
-    }
-    previousUser = $user;
-  }
-
-  onDestroy(() => {
-    if (subscription) {
-      subscription.unsubscribe();
-    }
-  });
-
-  function subscribe() {
-    if (subscription) {
-      subscription.unsubscribe();
-    }
-
-    loading = true;
-
-    subscription = Nymph.getEntities(
-      {
-        class: Game.class,
-        sort: 'cdate',
-        reverse: true
-      },
-      {
-        type: '!&',
-        strict: [
-          'state',
-          Game.FINISHED
-        ]
+  async function create() {
+    const newGame = new Game();
+    try {
+      if (await newGame.$save()) {
+        $game = newGame;
       }
-    ).subscribe(
-      (update) => {
-        loading = false;
-        if (update) {
-          PubSub.updateArray($games, update);
-          $games = Nymph.sort($games, 'cdate');
-        }
-      },
-      ErrHandler
-    );
-  }
-
-  function addTodo() {
-    if (todoText === undefined || todoText === '') {
-      return;
+    } catch (e) {
+      ErrHandler(e);
     }
-    const todo = new Game();
-    todo.name = todoText;
-    todo.$save().then(() => {
-      todoText = '';
-    }, ErrHandler);
   }
 
-  function deleteTodos() {
-    Nymph.deleteEntities($games);
+  async function join() {
+    try {
+      const joinedGame = await Game.join(joinCode.toUpperCase());
+      if (joinedGame) {
+        $game = joinedGame;
+      } else {
+        alert('That code is not working.');
+      }
+    } catch (e) {
+      ErrHandler(e);
+    }
   }
 </script>
+
+<style>
+  .lobby {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  * > :global(.lobby-section) {
+    width: max-content;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    width: max-content;
+  }
+</style>

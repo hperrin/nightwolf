@@ -9,15 +9,25 @@ use Respect\Validation\Exceptions\NestedValidationException;
  */
 class Game extends \Nymph\Entity {
   const ETYPE = 'game';
+
+  const PENDING = 0;
+  const IN_PROGRESS = 1;
+  const FINISHED = 2;
+
   protected $clientEnabledMethods = ['start', 'share', 'unshare'];
+  public static $clientEnabledStaticMethods = ['join'];
   protected $whitelistData = [];
   public static $searchRestrictedData = ['code'];
   protected $protectedTags = [];
   protected $whitelistTags = [];
 
-  const PENDING = 0;
-  const IN_PROGRESS = 1;
-  const FINISHED = 2;
+  /**
+   * This is explicitly used only for joining game.
+   *
+   * @var bool
+   * @access private
+   */
+  private $skipAcWhenSaving = false;
 
   public function __construct($id = 0) {
     $this->state = self::PENDING;
@@ -26,7 +36,7 @@ class Game extends \Nymph\Entity {
   }
 
   public static function generateCode() {
-    $chars = explode('', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789');
+    $chars = str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789');
 
     do {
       $code = '';
@@ -36,17 +46,43 @@ class Game extends \Nymph\Entity {
 
       $existingGame = \Nymph\Nymph::getEntity(
         ['class' => 'NightWolf\\Game', 'skip_ac' => true],
-        ['strict' =>
-          [
+        ['&',
+          'strict' => [
             ['code', $code],
-            ['started', false],
-            ['finished', false]
+            ['state', self::PENDING]
           ]
         ]
       );
-    } while ($existingGame->guid);
+    } while (isset($existingGame));
 
     return $code;
+  }
+
+  public static function join($code) {
+    if (!\Tilmeld\Tilmeld::gatekeeper()) {
+      // Only allow logged in users to join.
+      return false;
+    }
+
+    $game = \Nymph\Nymph::getEntity(
+      ['class' => 'NightWolf\\Game', 'skip_ac' => true],
+      ['&',
+        'strict' => [
+          ['code', $code],
+          ['state', self::PENDING]
+        ]
+      ]
+    );
+
+    if ($game &&
+      !\Tilmeld\Tilmeld::$currentUser->is($game->user) &&
+      !\Tilmeld\Tilmeld::$currentUser->inArray($game->acRead)
+    ) {
+      $game->acRead[] = \Tilmeld\Tilmeld::$currentUser;
+      return $game->saveSkipAC();
+    }
+
+    return false;
   }
 
   public function start() {
@@ -108,5 +144,21 @@ class Game extends \Nymph\Entity {
       throw new \Exception($exception->getFullMessage());
     }
     return parent::save();
+  }
+
+  /*
+   * This should *never* be accessible on the client.
+   */
+  public function saveSkipAC() {
+    $this->skipAcWhenSaving = true;
+    return $this->save();
+  }
+
+  public function tilmeldSaveSkipAC() {
+    if ($this->skipAcWhenSaving) {
+      $this->skipAcWhenSaving = false;
+      return true;
+    }
+    return false;
   }
 }

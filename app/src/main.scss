@@ -13,6 +13,10 @@ html {
   @include mdc-typography('body1');
 }
 
+.body2 {
+  @include mdc-typography('body2');
+}
+
 h1 {
   @include mdc-typography('headline1');
 }
@@ -37,7 +41,15 @@ h6 {
   @include mdc-typography('headline6');
 }
 
-caption {
+.subtitle1 {
+  @include mdc-typography('subtitle1');
+}
+
+.subtitle2 {
+  @include mdc-typography('subtitle2');
+}
+
+caption, .caption {
   @include mdc-typography('caption');
 }
 

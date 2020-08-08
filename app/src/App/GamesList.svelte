@@ -1,0 +1,90 @@
+{#if loading}
+  <div style="height: 40px; width: 100%; min-width: 300px;">
+    <LoadingIndicator />
+  </div>
+{:else}
+  {#if games.length}
+    {#each games as game (game.guid)}
+      <Card style="width: 320px;">
+        <div style="padding: 1rem;">
+          <h6 style="margin: 0;">Ongoing Game</h6>
+          <div class="subtitle2" style="margin: 0; color: #888;">Game Code: {game.code}</div>
+        </div>
+        <Content>...player list...</Content>
+        <Actions fullBleed>
+          <Button on:click={() => load(game)}>
+            <Label>Join</Label>
+          </Button>
+        </Actions>
+      </Card>
+    {/each}
+  {:else}
+    <small>You have no games in progress.</small>
+  {/if}
+{/if}
+
+<script>
+  import { Nymph, PubSub } from 'nymph-client';
+  import { onMount, onDestroy } from 'svelte';
+  import Button, {Label} from '@smui/button';
+  import Card, {Content, PrimaryAction, Media, MediaContent, Actions, ActionButtons, ActionIcons} from '@smui/card';
+
+  import Game from '../Entities/NightWolf/Game';
+  import ErrHandler from '../ErrHandler';
+  import { game } from '../stores';
+
+  import LoadingIndicator from './LoadingIndicator';
+
+  let subscription;
+  let loading = false;
+  let games = [];
+
+  // let previousUser;
+  // $: {
+  //   if ($user && !$user.$is(previousUser)) {
+  //     subscribe();
+  //   }
+  //   previousUser = $user;
+  // }
+
+  onMount(subscribe);
+
+  onDestroy(() => {
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+  });
+
+  function subscribe() {
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+
+    loading = true;
+
+    subscription = Nymph.getEntities(
+      {
+        class: Game.class,
+        sort: 'cdate',
+        reverse: true
+      },
+      {
+        type: '!&',
+        strict: ['state', Game.FINISHED]
+      }
+    ).subscribe(
+      (update) => {
+        loading = false;
+        if (update) {
+          PubSub.updateArray(games, update);
+          games = Nymph.sort(games, 'cdate', false, true);
+        }
+      },
+      ErrHandler
+    );
+  }
+
+  function load(g) {
+    $game = g;
+  }
+</script>
