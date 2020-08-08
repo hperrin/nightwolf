@@ -7,7 +7,7 @@
     {#each games as game (game.guid)}
       <Card style="width: 320px;">
         <div style="padding: 1rem;">
-          <h6 style="margin: 0;">Ongoing Game</h6>
+          <h6 style="margin: 0;">{stateText[game.state]} Game</h6>
           <div class="subtitle2" style="margin: 0; color: #888;">Game Code: {game.code}</div>
         </div>
         <Content>...player list...</Content>
@@ -38,6 +38,11 @@
   let subscription;
   let loading = false;
   let games = [];
+
+  const stateText = {
+    [Game.PENDING]: 'Pending',
+    [Game.IN_PROGRESS]: 'Ongoing'
+  };
 
   // let previousUser;
   // $: {
