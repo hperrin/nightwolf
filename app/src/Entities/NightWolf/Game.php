@@ -79,7 +79,11 @@ class Game extends \Nymph\Entity {
       !\Tilmeld\Tilmeld::$currentUser->inArray($game->acRead)
     ) {
       $game->acRead[] = \Tilmeld\Tilmeld::$currentUser;
-      return $game->saveSkipAC();
+      if ($game->saveSkipAC()) {
+        return $game;
+      } else {
+        return false;
+      }
     }
 
     return false;

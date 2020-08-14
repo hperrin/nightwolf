@@ -1,6 +1,14 @@
 <div>
   Game Code: {$game.code}
 </div>
+<div style="display: flex; justify-content: flex-start; align-items: center;">
+  {$game.$players().length} Player{$game.$players().length > 1 ? 's' : ''}:
+  {#each $game.$players() as user (user.guid)}
+    <div style="display: inline-block; margin-left: 0.5em;">
+      <Avatar user={user} />
+    </div>
+  {/each}
+</div>
 <div>
   <Button on:click={() => $game = null}><Label>Leave</Label></Button>
 </div>
@@ -9,6 +17,7 @@
   import {onMount, onDestroy} from 'svelte';
   import Button, {Label} from '@smui/button';
 
+  import Avatar from '../Player/Avatar';
   import Game from '../../Entities/NightWolf/Game';
   import ErrHandler from '../../ErrHandler';
   import { user, game } from '../../stores';

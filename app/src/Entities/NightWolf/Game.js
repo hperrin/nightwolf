@@ -5,6 +5,7 @@ export class Game extends Entity {
     super(id);
     this.code = null;
     this.state = Game.PENDING;
+    this.acRead = [];
   }
 
   $start(...args) {
@@ -17,6 +18,10 @@ export class Game extends Entity {
 
   $unshare(...args) {
     return this.$serverCall('unshare', args);
+  }
+
+  $players() {
+    return [this.user, ...this.acRead];
   }
 
   static join(code, ...args) {

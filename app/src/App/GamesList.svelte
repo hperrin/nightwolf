@@ -10,7 +10,13 @@
           <h6 style="margin: 0;">{stateText[game.state]} Game</h6>
           <div class="subtitle2" style="margin: 0; color: #888;">Game Code: {game.code}</div>
         </div>
-        <Content>...player list...</Content>
+        <Content>
+          {#each game.$players() as user (user.guid)}
+            <div style="display: inline-block; margin-right: 1em;">
+              <Avatar user={user} />
+            </div>
+          {/each}
+        </Content>
         <Actions fullBleed>
           <Button on:click={() => load(game)}>
             <Label>Join</Label>
@@ -33,6 +39,7 @@
   import ErrHandler from '../ErrHandler';
   import { game } from '../stores';
 
+  import Avatar from './Player/Avatar';
   import LoadingIndicator from './LoadingIndicator';
 
   let subscription;
