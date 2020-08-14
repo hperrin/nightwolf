@@ -14,7 +14,7 @@ class Game extends \Nymph\Entity {
   const IN_PROGRESS = 1;
   const FINISHED = 2;
 
-  protected $clientEnabledMethods = ['start', 'share', 'unshare'];
+  protected $clientEnabledMethods = ['start'];
   public static $clientEnabledStaticMethods = ['join'];
   protected $whitelistData = [];
   public static $searchRestrictedData = ['code'];
@@ -40,7 +40,7 @@ class Game extends \Nymph\Entity {
 
     do {
       $code = '';
-      for ($i = 0; $i < 5; $i++) {
+      for ($i = 0; $i < 4; $i++) {
         $code .= $chars[rand(0, count($chars) - 1)];
       }
 
@@ -99,26 +99,26 @@ class Game extends \Nymph\Entity {
     return $this->save();
   }
 
-  public function share($username) {
-    $user = \Tilmeld\Entities\User::factory($username);
-    if (!$user->guid) {
-      return false;
+  public function delete() {
+    if ($this->state === self::IN_PROGRESS &&
+      $this->mdate > microtime() - (4 * 60 * 60)
+    ) {
+      throw new \Exception(
+        'You can only delete a game in progress if it has been idle for more '.
+          'than 4 hours.'
+      );
     }
-    if (!$user->inArray($this->acWrite)) {
-      $this->acWrite[] = $user;
-    }
-    return $this->save();
-  }
 
-  public function unshare($guid) {
-    $user = \Tilmeld\Entities\User::factory($guid);
-    if (!$user->guid) {
-      return false;
+    if ($this->state === self::FINISHED &&
+      $this->mdate > microtime() - (30 * 60)
+    ) {
+      throw new \Exception(
+        'You can only delete a finished game after 20 minutes. Give everyone '.
+          'a chance to talk about it and enjoy.'
+      );
     }
-    while (($index = $user->arraySearch($this->acWrite)) !== false) {
-      array_splice($this->acWrite, $index, 1);
-    }
-    return $this->save();
+
+    return parent::delete();
   }
 
   public function save() {

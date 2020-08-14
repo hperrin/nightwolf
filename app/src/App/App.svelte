@@ -12,7 +12,7 @@
           <Textfield variant="outlined" label="Game Code" bind:value={joinCode} input$maxlength="5" />
         </div>
         <div style="margin-left: 20px;">
-          <Button on:click={join} disabled={joinCode.length != 5 || joinCode.match(/[^A-Z1-9]/)}>
+          <Button on:click={join} disabled={joinCode.length != 4 || joinCode.match(/[^A-Za-z1-9]/)}>
             <Label>Join Game</Label>
           </Button>
         </div>
@@ -48,6 +48,8 @@
     try {
       if (await newGame.$save()) {
         $game = newGame;
+      } else {
+        alert('The game couldn\'t be created. :(');
       }
     } catch (e) {
       ErrHandler(e);
@@ -58,6 +60,7 @@
     try {
       const joinedGame = await Game.join(joinCode.toUpperCase());
       if (joinedGame) {
+        joinCode = '';
         $game = joinedGame;
       } else {
         alert('That code is not working.');
@@ -85,6 +88,5 @@
     margin-bottom: 20px;
     display: flex;
     align-items: center;
-    width: max-content;
   }
 </style>

@@ -4,26 +4,28 @@
   </div>
 {:else}
   {#if games.length}
-    {#each games as game (game.guid)}
-      <Card style="width: 320px;">
-        <div style="padding: 1rem;">
-          <h6 style="margin: 0;">{stateText[game.state]} Game</h6>
-          <div class="subtitle2" style="margin: 0; color: #888;">Game Code: {game.code}</div>
-        </div>
-        <Content>
-          {#each game.$players() as user (user.guid)}
-            <div style="display: inline-block; margin-right: 1em;">
-              <Avatar user={user} />
-            </div>
-          {/each}
-        </Content>
-        <Actions fullBleed>
-          <Button on:click={() => load(game)}>
-            <Label>Join</Label>
-          </Button>
-        </Actions>
-      </Card>
-    {/each}
+    <div class="game-container">
+      {#each games as game (game.guid)}
+        <Card style="width: 320px;">
+          <div style="padding: 1rem;">
+            <h6 style="margin: 0;">{stateText[game.state]} Game</h6>
+            <div class="subtitle2" style="margin: 0; color: #888;">Game Code: <code>{game.code}</code></div>
+          </div>
+          <Content>
+            {#each game.$players() as user (user.guid)}
+              <div style="display: inline-block; margin-right: 1em;">
+                <Avatar user={user} />
+              </div>
+            {/each}
+          </Content>
+          <Actions fullBleed>
+            <Button on:click={() => load(game)}>
+              <Label>Rejoin</Label>
+            </Button>
+          </Actions>
+        </Card>
+      {/each}
+    </div>
   {:else}
     <small>You have no games in progress.</small>
   {/if}
@@ -100,3 +102,14 @@
     $game = g;
   }
 </script>
+
+<style>
+  .game-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .game-container > :global(*) {
+    margin: 0 1em 1em;
+  }
+</style>
